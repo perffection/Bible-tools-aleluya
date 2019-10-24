@@ -4,7 +4,7 @@ import sublime, sublime_plugin
 import urllib.request
 import urllib.parse
 
-class BibleRefAleluyaCommand(sublime_plugin.TextCommand):
+class BibleToolsAleluyaCommand(sublime_plugin.TextCommand):
   def run(self, edit):
     print("Hallelujah")
     with urllib.request.urlopen('https://api1.bible.systems/John+3:16') as response_aleluya:

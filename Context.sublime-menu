@@ -1,7 +1,7 @@
 [
 {
-    "id" : "BibleRefAleluya",
-    "caption" : "Bible Ref Aleluya",
-    "command" : "bible_ref_aleluya"
+    "id" : "BibleToolsAleluya",
+    "caption" : "Bible Tools Aleluya",
+    "command" : "bible_tools_aleluya"
 }
 ] 
