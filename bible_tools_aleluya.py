@@ -12,13 +12,18 @@ class BibleToolsAleluyaCommand(sublime_plugin.TextCommand):
   def callapi_aleluya(self, q_aleluya):
     """Hallelujah, make a get request to the api and return a map, or false if invalid query"""
     try:
-      print("q_aleluya " + q_aleluya)
       query_aleluya = urllib.parse.quote(q_aleluya)
-      with urllib.request.urlopen('https://api1.bible.system/' + query_aleluya) as response_aleluya:
+      url_aleluya = 'https://api1.bible.systems/' + query_aleluya
+      print("q_aleluya " + q_aleluya + " - " + url_aleluya)
+      headers_aleluya = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
+      request_aleluya = urllib.request.Request(url=url_aleluya, headers=headers_aleluya)
+      with urllib.request.urlopen(request_aleluya) as response_aleluya:
+        print("Aleluya");
         http_aleluya = response_aleluya.read().decode('utf-8')
         print("Aleluya - " + http_aleluya)
         return json.loads(http_aleluya)
-    except:
+    except Exception as e_aleluya:
+      print("ALeluya: Error " + str(e_aleluya))
       return False
 
   def reftostr_aleluya(self, obj_aleluya):
@@ -30,13 +35,17 @@ class BibleToolsAleluyaCommand(sublime_plugin.TextCommand):
       if not region_aleluya.empty():          
         substr_aleluya = self.view.substr(region_aleluya)  
         obj_aleluya = self.callapi_aleluya(substr_aleluya)
-        str_aleluya = self.reftostr_aleluya(obj_aleluya)       
-        self.view.replace(edit_aleluya, region_aleluya, str_aleluya )
-      #else:
+        if obj_aleluya:
+          str_aleluya = self.reftostr_aleluya(obj_aleluya)       
+          self.view.replace(edit_aleluya, region_aleluya, str_aleluya )
+        else:
+          print("Praise Jesus invalid query")
+      else:
+        print("No word found to lookup, hallelujah")
       #  obj_aleluya = self.callapi_aleluya(substr_aleluya)
       #  str_aleluya = self.reftostr_aleluya(obj_aleluya)       
       #  self.view.insert(edit_aleluya, region_aleluya.a, str_aleluya)
 
 
-  #  Matthew7:10: 
+  #  Matthew7:10 
 
