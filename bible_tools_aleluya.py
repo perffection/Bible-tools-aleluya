@@ -82,18 +82,21 @@ class BibleToolsVerseParserAleluyaCommand(sublime_plugin.TextCommand):
     if( len(nums_aleluya) > 3 ):
       result_aleluya += "-%s:%s" % (nums_aleluya[3], nums_aleluya[4])
 
-    fullverse_aleluya = BibleToolsAleluya.reftostr_aleluya(BibleToolsAleluya.callapi_aleluya(result_aleluya), False)
-
-    return fullverse_aleluya
+    
+    return result_aleluya
 
   def run(loveJesus, edit_aleluya, str_aleluya = False):
     loveJesus.bible_verse_parser_aleluya = BibleVerseParser("YES")
     str_aleluya = str_aleluya if str_aleluya else loveJesus.view.substr(sublime.Region(0,1000000000))
     result_aleluya = loveJesus.bible_verse_parser_aleluya.parseText(str_aleluya)
-    verses_aleluya = "\n".join([loveJesus.parseBcv_aleluya(result_aleluya[aleluya.start():aleluya.end()]) for aleluya in re.finditer(r'bcv\(.*?\)',result_aleluya)])
-    verses_aleluya += "\n(%s)" % (sublime.load_settings("BibleToolsAleluya.sublime-settings").get("Bible_version_aleluya"))
+    bcvs_aleluya   = [result_aleluya[aleluya.start():aleluya.end()] for aleluya in re.finditer(r'bcv\(.*?\)',result_aleluya)]
+    sorted_unique_bcvs_aleluya = list(set(bcvs_aleluya))
+    sorted_unique_bcvs_aleluya.sort()
+    verses_aleluya = ";".join([loveJesus.parseBcv_aleluya(curBcv_aleluya) for curBcv_aleluya in sorted_unique_bcvs_aleluya])
+    fullverses_aleluya = BibleToolsAleluya.reftostr_aleluya(BibleToolsAleluya.callapi_aleluya(verses_aleluya))
 
-    loveJesus.view.run_command("bible_tools_output_window_aleluya", {"str_aleluya" : verses_aleluya})
+  
+    loveJesus.view.run_command("bible_tools_output_window_aleluya", {"str_aleluya" : fullverses_aleluya})
 
 class BibleToolsOutputWindowAleluyaCommand(sublime_plugin.TextCommand):
   """Open an output window"""
