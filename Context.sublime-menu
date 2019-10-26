@@ -9,7 +9,7 @@
       "children" : [
         {
           "id" : "BibleToolsAleluya_selectionReplace",
-          "caption" : "Replace Reference from Selection",
+          "caption" : "Replace Reference from exact Selection",
           "command" : "bible_tools_selected_ref_search_aleluya",
           "args" : {
             "in_place_aleluya" : true
@@ -22,8 +22,14 @@
       "command" : "bible_tools_input_ref_search_aleluya"
     },{
       "id" : "BibleToolsAleluya_selection",
-      "caption" : "Reference from Selection",
+      "caption" : "Parse Reference from Selection",
       "command" : "bible_tools_selected_ref_search_aleluya"
-    },]
+    },
+    {
+      "id" : "BibleToolsAleluya_parser",
+      "caption" : "Parse References from whole Doc",
+      "command" : "bible_tools_verse_parser_aleluya"
+    },
+    ]
 }
 ] 

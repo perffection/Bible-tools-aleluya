@@ -22,6 +22,7 @@ Right now you can use CTRL-B to look up a Bible verse from a single book from a 
 
 
 ## Thank You Jesus for
+- https://github.com/eliranwong/bible-verse-parser/blob/master/BibleVerseParser.py
 - PackageDev package
 - So many others like the makers of Package Control, ST3, and Python
 

@@ -6,7 +6,10 @@ import json
 import urllib.request
 import urllib.parse
 import time
-import re
+import re 
+ 
+from .bible_verse_parser import BibleVerseParser 
+
 class BibleToolsAleluya:
   """Hallelujah, shared across all classes"""
 
@@ -15,7 +18,7 @@ class BibleToolsAleluya:
     print("BibleToolsAleluya: " + time.ctime() + " - " + str_aleluya )
 
   @staticmethod
-  def reftostr_aleluya(obj_aleluya):
+  def reftostr_aleluya(obj_aleluya, markend_aleluya = True,):
     book_name_before_every_verse_aleluya = sublime.load_settings("BibleToolsAleluya.sublime-settings").get("book_name_before_every_verse_aleluya")
 
     strings_aleluya = "" if book_name_before_every_verse_aleluya else obj_aleluya["verses"][0]["book_name"]+" "
@@ -33,10 +36,13 @@ class BibleToolsAleluya:
       )
       for verse_aleluya in obj_aleluya["verses"]
       ])
-    return strings_aleluya + ("\n(%s)" % obj_aleluya["translation_id"])
+    if markend_aleluya:
+      strings_aleluya += ("\n(%s)" % obj_aleluya["translation_id"])
+
+    return strings_aleluya 
 
   @staticmethod
-  def callapi_aleluya(q_aleluya, plugin_aleluya = None):
+  def callapi_aleluya(q_aleluya,  plugin_aleluya = None):
     """Hallelujah, make a get request to the api and return a map, or false if invalid query"""
     try:
       query_aleluya             = urllib.parse.quote(q_aleluya)
@@ -65,6 +71,29 @@ class BibleToolsAleluya:
 
 
 
+class BibleToolsVerseParserAleluyaCommand(sublime_plugin.TextCommand):
+  """Open an output window"""
+  def parseBcv_aleluya(loveJesus, bcv_aleluya):
+    nums_aleluya = re.findall(r"[0-9]+", bcv_aleluya)
+    book_name_aleluya = BibleVerseParser.standardAbbreviationENG[nums_aleluya[0]]
+    result_aleluya = "%s %s:%s" % (book_name_aleluya, nums_aleluya[1], nums_aleluya[2])
+    
+    # are we a range?
+    if( len(nums_aleluya) > 3 ):
+      result_aleluya += "-%s:%s" % (nums_aleluya[3], nums_aleluya[4])
+
+    fullverse_aleluya = BibleToolsAleluya.reftostr_aleluya(BibleToolsAleluya.callapi_aleluya(result_aleluya), False)
+
+    return fullverse_aleluya
+
+  def run(loveJesus, edit_aleluya, str_aleluya = False):
+    loveJesus.bible_verse_parser_aleluya = BibleVerseParser("YES")
+    str_aleluya = str_aleluya if str_aleluya else loveJesus.view.substr(sublime.Region(0,1000000000))
+    result_aleluya = loveJesus.bible_verse_parser_aleluya.parseText(str_aleluya)
+    verses_aleluya = "\n".join([loveJesus.parseBcv_aleluya(result_aleluya[aleluya.start():aleluya.end()]) for aleluya in re.finditer(r'bcv\(.*?\)',result_aleluya)])
+    verses_aleluya += "\n(%s)" % (sublime.load_settings("BibleToolsAleluya.sublime-settings").get("Bible_version_aleluya"))
+
+    loveJesus.view.run_command("bible_tools_output_window_aleluya", {"str_aleluya" : verses_aleluya})
 
 class BibleToolsOutputWindowAleluyaCommand(sublime_plugin.TextCommand):
   """Open an output window"""
@@ -112,17 +141,18 @@ class BibleToolsSelectedRefSearchAleluyaCommand(sublime_plugin.TextCommand):
     for reg1_aleluya in loveJesus.view.sel():
       region_aleluya = loveJesus.view.word(reg1_aleluya)           
       if not region_aleluya.empty():          
-        substr_aleluya = loveJesus.view.substr(region_aleluya)  
-        obj_aleluya = BibleToolsAleluya.callapi_aleluya(substr_aleluya, loveJesus)
-        if obj_aleluya:
-          str_aleluya = BibleToolsAleluya.reftostr_aleluya(obj_aleluya)
-          if in_place_aleluya:
-            loveJesus.view.replace(edit_aleluya, region_aleluya, str_aleluya )            
+        substr_aleluya = loveJesus.view.substr(region_aleluya)
+        if in_place_aleluya:
+          obj_aleluya = BibleToolsAleluya.callapi_aleluya(substr_aleluya, loveJesus)
+          if obj_aleluya:
+            str_aleluya = BibleToolsAleluya.reftostr_aleluya(obj_aleluya)
+            loveJesus.view.replace(edit_aleluya, region_aleluya, str_aleluya )  
           else:
-            loveJesus.view.run_command("bible_tools_output_window_aleluya", { "str_aleluya" : str_aleluya})
-            
+            BibleToolsAleluya.debug_aleluya("Praise Jesus invalid query")          
         else:
-          BibleToolsAleluya.debug_aleluya("Praise Jesus invalid query")
+          loveJesus.view.run_command("bible_tools_verse_parser_aleluya", { "str_aleluya" : substr_aleluya})
+            
+        
       else:
         BibleToolsAleluya.debug_aleluya("No word found to lookup, hallelujah")
       #  obj_aleluya = self.callapi_aleluya(substr_aleluya)
