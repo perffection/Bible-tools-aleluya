@@ -1,8 +1,8 @@
 ## Bible Tools Aleluya
 # For God so loved the world, that He gave His only begotten Son, that all who believe in Him should not perish but have everlasting life
 
-Welcome, this is a simple plugin that interfaces with an app at https://api1.bible.systems which is currently based off https://bible-api.com that will look up Bible references in KJV.
-43
+Welcome, this is a simple plugin that interfaces with an app at https://api1.bible.systems which is currently based off https://bible-api.com that will look up Bible references.
+
 ### Desired Functionality
 
 #### Short Term
@@ -15,5 +15,10 @@ Welcome, this is a simple plugin that interfaces with an app at https://api1.bib
 - Make tex documents with included references
 - Choose Bible versions
 - Search for other materials (Biblical Characters, Cross References, Maps, Images, etc...)
+
+
+## Thank You Jesus for
+- PackageDev package
+- So many others like the makers of Package Control, ST3, and Python
 
 # Hallelujah

@@ -1,0 +1,5 @@
+{
+  "Bible_version_aleluya" : "kjv",
+  "Bible_version_options_aleluya" : ["kjv","web"],
+  "book_name_before_every_verse_aleluya" : true
+}

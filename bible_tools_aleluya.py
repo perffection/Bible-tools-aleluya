@@ -5,43 +5,123 @@ import sublime, sublime_plugin
 import json
 import urllib.request
 import urllib.parse
+import time
+import re
+class BibleToolsAleluya:
+  """Hallelujah, shared across all classes"""
 
-class BibleToolsAleluyaCommand(sublime_plugin.TextCommand):
-  """Hallelujah, tools to work with the Bible, particularly references at this point"""
+  @staticmethod
+  def debug_aleluya(str_aleluya):
+    print("BibleToolsAleluya: " + time.ctime() + " - " + str_aleluya )
 
-  def callapi_aleluya(self, q_aleluya):
+  @staticmethod
+  def reftostr_aleluya(obj_aleluya):
+    book_name_before_every_verse_aleluya = sublime.load_settings("BibleToolsAleluya.sublime-settings").get("book_name_before_every_verse_aleluya")
+
+    strings_aleluya = "" if book_name_before_every_verse_aleluya else obj_aleluya["verses"][0]["book_name"]+" "
+    strings_aleluya += "\n".join([
+      ( 
+        re.sub( 
+          r"\s+"," ",
+          ("%s%s:%s: %s" % ( 
+            (verse_aleluya["book_name"]+" ") if book_name_before_every_verse_aleluya else "", 
+            verse_aleluya["chapter"], 
+            verse_aleluya["verse"], 
+            verse_aleluya["text"]))
+            .replace("\n"," ")
+        )
+      )
+      for verse_aleluya in obj_aleluya["verses"]
+      ])
+    return strings_aleluya + ("\n(%s)" % obj_aleluya["translation_id"])
+
+  @staticmethod
+  def callapi_aleluya(q_aleluya, plugin_aleluya = None):
     """Hallelujah, make a get request to the api and return a map, or false if invalid query"""
     try:
-      query_aleluya = urllib.parse.quote(q_aleluya)
+      query_aleluya             = urllib.parse.quote(q_aleluya)
+      bible_translation_aleluya = sublime.load_settings("BibleToolsAleluya.sublime-settings").get("Bible_version_aleluya")
+      verse_numbers_aleluya     = "false"
+
       url_aleluya = 'https://api1.bible.systems/' + query_aleluya
-      print("q_aleluya " + q_aleluya + " - " + url_aleluya)
+      url_aleluya += "?translation="+bible_translation_aleluya
+      url_aleluya += "&verse_numbers="+verse_numbers_aleluya
+
+      BibleToolsAleluya.debug_aleluya(q_aleluya + " - " + url_aleluya)
+      
       headers_aleluya = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'}
-      request_aleluya = urllib.request.Request(url=url_aleluya, headers=headers_aleluya)
+      request_aleluya = urllib.request.Request(url = url_aleluya, headers = headers_aleluya)
       with urllib.request.urlopen(request_aleluya) as response_aleluya:
-        print("Aleluya");
         http_aleluya = response_aleluya.read().decode('utf-8')
-        print("Aleluya - " + http_aleluya)
+        BibleToolsAleluya.debug_aleluya("Respone aleluya - " + http_aleluya)
         return json.loads(http_aleluya)
     except Exception as e_aleluya:
-      print("ALeluya: Error " + str(e_aleluya))
+      BibleToolsAleluya.debug_aleluya("Aleluya: Error " + str(e_aleluya))
       return False
 
-  def reftostr_aleluya(self, obj_aleluya):
-    return obj_aleluya["reference"] +": " + obj_aleluya["text"][1:-1] + " -" + obj_aleluya["translation_id"]
 
-  def run(self, edit_aleluya):
-    for reg1_aleluya in self.view.sel():
-      region_aleluya = self.view.word(reg1_aleluya)              
+
+
+
+class BibleToolsOutputWindowAleluyaCommand(sublime_plugin.TextCommand):
+  """Open an output window"""
+  def run(aleluya, edit_aleluya, str_aleluya):
+    #aleluya.view.replace(edit_aleluya, region_aleluya, str_aleluya )
+    output_view = aleluya.view.window().create_output_panel("BibleToolsAleluya", True)  # self.view 
+    #self.view.replace(edit_aleluya, region_aleluya, str_aleluya )
+    BibleToolsAleluya.debug_aleluya("Aleluya Should insert? - " + str_aleluya)
+    output_view.insert(edit_aleluya, 0 , str_aleluya)
+    aleluya.view.window().run_command("show_panel",{"panel":"output.BibleToolsAleluya"})
+    
+
+
+
+
+class BibleToolsInputRefSearchAleluyaCommand(sublime_plugin.TextCommand):
+  """Hallelujah, query the user for a reference to look up"""
+  def prompt_aleluya(aleluya, str_aleluya):
+    """Called when we user submits in the input panel"""
+    obj_aleluya = BibleToolsAleluya.callapi_aleluya(str_aleluya, aleluya)
+    if obj_aleluya:
+      str_aleluya = BibleToolsAleluya.reftostr_aleluya(obj_aleluya)       
+      aleluya.view.run_command("bible_tools_output_window_aleluya", { "str_aleluya" : str_aleluya})
+    else:
+      BibleToolsAleluya.debug_aleluya("Praise Jesus invalid query")
+
+  def run(aleluya, edit_aleluya):
+    str_aleluya = ""
+    for reg1_aleluya in aleluya.view.sel():
+      region_aleluya = reg1_aleluya #aleluya.view.word(reg1_aleluya)           
+      if not region_aleluya.empty():
+        substr_aleluya = aleluya.view.substr(region_aleluya)
+        str_aleluya += substr_aleluya
+
+    aleluya.edit_aleluya = edit_aleluya
+    aleluya.view.window().show_input_panel("Bible References:", str_aleluya, aleluya.prompt_aleluya, None, None)
+    
+
+
+
+
+class BibleToolsSelectedRefSearchAleluyaCommand(sublime_plugin.TextCommand):
+  """Hallelujah, search for a reference under the cursor"""
+  def run(aleluya, edit_aleluya, in_place_aleluya = False):
+    for reg1_aleluya in aleluya.view.sel():
+      region_aleluya = aleluya.view.word(reg1_aleluya)           
       if not region_aleluya.empty():          
-        substr_aleluya = self.view.substr(region_aleluya)  
-        obj_aleluya = self.callapi_aleluya(substr_aleluya)
+        substr_aleluya = aleluya.view.substr(region_aleluya)  
+        obj_aleluya = BibleToolsAleluya.callapi_aleluya(substr_aleluya, aleluya)
         if obj_aleluya:
-          str_aleluya = self.reftostr_aleluya(obj_aleluya)       
-          self.view.replace(edit_aleluya, region_aleluya, str_aleluya )
+          str_aleluya = BibleToolsAleluya.reftostr_aleluya(obj_aleluya)
+          if in_place_aleluya:
+            aleluya.view.replace(edit_aleluya, region_aleluya, str_aleluya )            
+          else:
+            aleluya.view.run_command("bible_tools_output_window_aleluya", { "str_aleluya" : str_aleluya})
+            
         else:
-          print("Praise Jesus invalid query")
+          BibleToolsAleluya.debug_aleluya("Praise Jesus invalid query")
       else:
-        print("No word found to lookup, hallelujah")
+        BibleToolsAleluya.debug_aleluya("No word found to lookup, hallelujah")
       #  obj_aleluya = self.callapi_aleluya(substr_aleluya)
       #  str_aleluya = self.reftostr_aleluya(obj_aleluya)       
       #  self.view.insert(edit_aleluya, region_aleluya.a, str_aleluya)
