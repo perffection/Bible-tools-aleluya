@@ -1,7 +1,8 @@
+// For God so loved the world, that He gave His only begotten Son, that all who believe in Him should not perish but have everlasting life
 [
 {
     "id" : "BibleToolsAleluya",
-    "caption" : "Bible Tools Aleluya",
+    "caption" : "Bible Tools ✝",
     "children" : [ {
       "id" : "BibleToolsAleluya_inPlace",
       "caption" : "Replace Text",

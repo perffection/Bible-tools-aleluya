@@ -3,6 +3,10 @@
 
 Welcome, this is a simple plugin that interfaces with an app at https://api1.bible.systems which is currently based off https://bible-api.com that will look up Bible references.
 
+## How To Use
+Right now you can use CTRL-B to look up a Bible verse from a single book from a popup. You can right click for a context menu that will do this or instantly search from your selected text, with the option to inmediately replace the text with the verses. You can also change settings for the keybindings and the version to use ( see https://api1.bible.systems ). These can be changed from the Preferences Menu.
+
+
 ### Desired Functionality
 
 #### Short Term
